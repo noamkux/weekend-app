@@ -62,7 +62,14 @@ const MOCK_TRIPS: Trip[] = [
   },
 ];
 
-export function HomePage() {
+interface Props {
+  onNavigateToSettlement: (
+    tripId: string,
+    members: { id: string; displayName: string }[],
+  ) => void;
+}
+
+export function HomePage({ onNavigateToSettlement }: Props) {
   const [activeNav, setActiveNav] = useState("trips");
   const [showModal, setShowModal] = useState(false);
   const { t } = useLang();
@@ -87,7 +94,10 @@ export function HomePage() {
           <TripList
             trips={MOCK_TRIPS}
             onTripClick={(id: string) =>
-              console.log("TODO: navigate to trip", id)
+              onNavigateToSettlement(id, [
+                { id: "mock-1", displayName: "יוסי" },
+                { id: "mock-2", displayName: "רוני" },
+              ])
             }
           />
         </main>

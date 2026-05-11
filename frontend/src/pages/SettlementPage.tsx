@@ -16,9 +16,10 @@ interface Member {
 interface Props {
   tripId: string;
   members: Member[];
+  onBack: () => void;
 }
 
-const SettlementPage: React.FC<Props> = ({ tripId, members }) => {
+const SettlementPage: React.FC<Props> = ({ tripId, members, onBack }) => {
   const { t, dir } = useContext(LangContext)!;
   const { user } = useAuth();
   const {
@@ -41,9 +42,15 @@ const SettlementPage: React.FC<Props> = ({ tripId, members }) => {
 
   return (
     <div className="p-4 space-y-8 max-w-lg mx-auto" dir={dir}>
+      <button
+        onClick={onBack}
+        className="text-sm text-gray-500 flex items-center gap-1"
+      >
+        ← חזרה
+      </button>
+
       <h1 className="text-2xl font-bold">{t.settlementTitle}</h1>
 
-      {/* הוסף הוצאה */}
       <section>
         <h2 className="text-lg font-semibold mb-3">{t.settlementAddExpense}</h2>
         <AddExpenseForm
@@ -53,7 +60,6 @@ const SettlementPage: React.FC<Props> = ({ tripId, members }) => {
         />
       </section>
 
-      {/* רשימת הוצאות */}
       <section>
         <h2 className="text-lg font-semibold mb-3">{t.settlementExpenses}</h2>
         <ExpensesList
@@ -63,7 +69,6 @@ const SettlementPage: React.FC<Props> = ({ tripId, members }) => {
         />
       </section>
 
-      {/* סיכום */}
       <section>
         <h2 className="text-lg font-semibold mb-3">{t.settlementSummary}</h2>
         <SettlementSummary balances={balances} settlements={settlements} />
