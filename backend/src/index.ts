@@ -1,9 +1,14 @@
-import "dotenv/config"; // ← שורה ראשונה בקובץ, לפני הכל
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import settlementRoutes from "./routes/settlements";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/users";
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+export const prisma = new PrismaClient({ adapter }); // ← export כדי שה-routes ישתמשו בו
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;

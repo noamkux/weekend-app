@@ -1,12 +1,9 @@
 import { Router, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { prisma } from "../index"; // ← במקום ליצור instance חדש
 
 const router = Router();
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 // POST /api/auth/register
