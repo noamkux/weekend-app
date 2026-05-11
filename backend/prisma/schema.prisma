@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  phone        String?  @unique  
+  displayName  String
+  passwordHash String       
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+
+  trips        TripMember[]
+  paidExpenses         Expense[]
+  expenseParticipations ExpenseParticipant[]
+}
+model Trip {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  status      TripStatus @default(voting)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  members     TripMember[]
+  voteOptions VoteOption[]
+  expenses    Expense[]
+}
+
+enum TripStatus {
+  voting
+  planning
+  active
+  settlement
+  archived
+}
+
+model TripMember {
+  id       String   @id @default(uuid())
+  tripId   String
+  userId   String
+  role     MemberRole @default(member)
+  joinedAt DateTime @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  votes    Vote[]
+
+  @@unique([tripId, userId])
+}
+
+enum MemberRole {
+  admin
+  member
+}
+
+model VoteOption {
+  id       String           @id @default(uuid())
+  tripId   String
+  category VoteCategory
+  label    String
+  detail   String?
+
+  trip  Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  votes Vote[]
+}
+
+enum VoteCategory {
+  location
+  date
+  activity
+}
+
+model Vote {
+  id           String @id @default(uuid())
+  tripMemberId String
+  voteOptionId String
+
+  member     TripMember @relation(fields: [tripMemberId], references: [id], onDelete: Cascade)
+  voteOption VoteOption @relation(fields: [voteOptionId], references: [id], onDelete: Cascade)
+
+  @@unique([tripMemberId, voteOptionId])
+}
+
+// מוכן לעתיד — settlement
+model Expense {
+  id          String               @id @default(uuid())
+  tripId      String
+  paidById    String
+  amount      Float
+  description String
+  createdAt   DateTime             @default(now())
+
+  paidBy      User                 @relation(fields: [paidById], references: [id])
+  participants ExpenseParticipant[]
+
+  @@map("expenses")
+}
+
+model ExpenseParticipant {
+  expenseId String
+  userId    String
+
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@id([expenseId, userId])
+  @@map("expense_participants")
+}
